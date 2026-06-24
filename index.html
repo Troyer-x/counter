@@ -18,8 +18,9 @@
       --sub: #747d8c;
     }
 
+    html, body { background: var(--bg); }
+
     body {
-      background: var(--bg);
       color: var(--text);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
@@ -29,6 +30,17 @@
       justify-content: center;
       padding: 2rem 1rem;
       overflow-x: hidden;
+      position: relative;
+    }
+
+    body.shake { animation: screen-shake 0.35s ease; }
+
+    @keyframes screen-shake {
+      0%, 100% { transform: translate(0, 0); }
+      20%      { transform: translate(-6px, 3px) rotate(-0.5deg); }
+      40%      { transform: translate(5px, -4px) rotate(0.5deg); }
+      60%      { transform: translate(-4px, 4px); }
+      80%      { transform: translate(4px, -2px); }
     }
 
     /* animated bg dots */
@@ -40,6 +52,40 @@
       background-size: 32px 32px;
       pointer-events: none;
       z-index: 0;
+    }
+
+    /* CRT scanlines + vignette */
+    .crt-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          #ffffff0a 0px,
+          #ffffff0a 1px,
+          transparent 1px,
+          transparent 3px
+        ),
+        radial-gradient(ellipse at center, transparent 55%, #00000099 100%);
+      mix-blend-mode: overlay;
+      opacity: 0.7;
+    }
+
+    .ambient {
+      position: fixed;
+      top: -10vh;
+      width: 38px;
+      opacity: 0.35;
+      z-index: 0;
+      pointer-events: none;
+      border-radius: 10px;
+      animation: ambient-fall linear forwards;
+    }
+
+    @keyframes ambient-fall {
+      to { transform: translateY(115vh) rotate(360deg); }
     }
 
     .container {
@@ -66,6 +112,44 @@
 
     .meme-top span {
       color: var(--accent2);
+    }
+
+    /* ─── Alba explosion (spawned on click, not in normal flow) ───────────── */
+    .explosion-center {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 220px;
+      z-index: 45;
+      pointer-events: none;
+      border-radius: 8px;
+      box-shadow: 0 0 50px #ff4757aa;
+      animation: explosion-center-pop 2.2s cubic-bezier(0.2, 0.8, 0.3, 1.2) forwards;
+    }
+
+    @keyframes explosion-center-pop {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.1) rotate(0deg); }
+      18%  { opacity: 1; transform: translate(-50%, -50%) scale(1.3) rotate(-6deg); }
+      35%  { transform: translate(-50%, -50%) scale(1.05) rotate(4deg); }
+      75%  { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3) rotate(0deg); }
+    }
+
+    .explosion-shard {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 70px;
+      z-index: 44;
+      pointer-events: none;
+      border-radius: 6px;
+      opacity: 0;
+      animation: shard-fly 2s ease-out forwards;
+    }
+
+    @keyframes shard-fly {
+      0%   { opacity: 1; transform: translate(-50%, -50%) translate(0, 0) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(0.4) rotate(var(--rot)); }
     }
 
     .card {
@@ -128,7 +212,17 @@
     }
 
     .count.bump {
-      transform: scale(1.15);
+      transform: scale(1.15) rotate(-2deg);
+    }
+
+    .rank {
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent2);
+      font-weight: 700;
+      min-height: 1.2em;
+      text-align: center;
     }
 
     .btn {
@@ -147,6 +241,15 @@
       box-shadow: 0 4px 0 #7f0000;
       position: relative;
       top: 0;
+      animation: btn-idle-wiggle 2.4s ease-in-out infinite;
+    }
+
+    @keyframes btn-idle-wiggle {
+      0%, 80%, 100% { transform: rotate(0deg); }
+      82% { transform: rotate(-1.5deg); }
+      86% { transform: rotate(1.5deg); }
+      90% { transform: rotate(-1deg); }
+      94% { transform: rotate(0deg); }
     }
 
     .btn:hover { background: #ff6b81; }
@@ -160,6 +263,14 @@
     .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    .caption-roulette {
+      font-size: 0.85rem;
+      color: var(--sub);
+      min-height: 1.2em;
+      text-align: center;
+      font-style: italic;
     }
 
     .status {
@@ -179,19 +290,94 @@
       font-style: italic;
     }
 
-    .session-badge {
-      font-size: 0.75rem;
-      background: #ffffff0d;
-      border: 1px solid #2f2f2f;
-      border-radius: 999px;
-      padding: 0.3rem 0.9rem;
-      color: var(--sub);
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      font-size: 2rem;
+      pointer-events: none;
+      z-index: 5;
+      animation: confetti-fall 1s ease-in forwards;
     }
 
-    .session-badge b { color: var(--accent2); }
+    @keyframes confetti-fall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(60vh) rotate(360deg); opacity: 0; }
+    }
+
+    .mute-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 60;
+      background: #ffffff10;
+      border: 1px solid #2f2f2f;
+      border-radius: 999px;
+      color: var(--text);
+      font-size: 1.1rem;
+      width: 2.4rem;
+      height: 2.4rem;
+      cursor: pointer;
+    }
+
+    .milestone-banner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      z-index: 40;
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(2.5rem, 12vw, 6rem);
+      text-transform: uppercase;
+      text-align: center;
+      color: #fff;
+      letter-spacing: 2px;
+      opacity: 0;
+      pointer-events: none;
+      text-shadow:
+        3px 0 0 #ff4757,
+        -3px 0 0 #1e90ff,
+        0 0 30px #000;
+    }
+
+    .milestone-banner.show {
+      animation: milestone-pop 1.6s ease-out forwards;
+    }
+
+    @keyframes milestone-pop {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-8deg); }
+      15%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(3deg); }
+      25%  { transform: translate(-50%, -50%) scale(1) rotate(-2deg); }
+      80%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3) rotate(0deg); }
+    }
+
+    .flash {
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      z-index: 30;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .flash.go {
+      animation: flash-pop 0.4s ease-out;
+    }
+
+    @keyframes flash-pop {
+      0%   { opacity: 0.85; }
+      100% { opacity: 0; }
+    }
   </style>
 </head>
 <body>
+  <div class="crt-overlay"></div>
+  <div class="flash" id="flash"></div>
+  <div class="milestone-banner" id="milestoneBanner"></div>
+
+  <button class="mute-toggle" id="muteBtn" title="toggle sound">🔊</button>
+
   <div class="container">
     <p class="meme-top">every time <span>Alba</span> says…</p>
 
@@ -201,11 +387,11 @@
       <div class="divider"></div>
       <p class="count-label">times said</p>
       <div class="count" id="count">—</div>
-      <button class="btn" id="btn" onclick="increment()">+ He said it again</button>
+      <p class="rank" id="rank"></p>
+      <button class="btn" id="btn" onclick="increment()">+ She said it again</button>
+      <p class="caption-roulette" id="caption"></p>
       <p class="status" id="status">Connecting…</p>
     </div>
-
-    <p class="meme-badge session-badge">session taps: <b id="session">0</b></p>
 
     <p class="meme-bottom">"basically, it's like… basically…"</p>
   </div>
@@ -229,16 +415,160 @@
     const db  = getFirestore(app);
     const ref = doc(db, "counters", "basically");
 
-    let session = 0;
+    // ─── sound (Web Audio, no asset needed) ────────────────────────────────
+    let soundOn = true;
+    let audioCtx = null;
 
-    // real-time listener
+    document.getElementById("muteBtn").onclick = () => {
+      soundOn = !soundOn;
+      document.getElementById("muteBtn").textContent = soundOn ? "🔊" : "🔇";
+    };
+
+    function beep(freq, duration, type = "square") {
+      if (!soundOn) return;
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function popSound() { beep(440, 0.12); }
+    function milestoneSound() {
+      [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, 0.25, "triangle"), i * 90));
+    }
+
+    // ─── ambient floating face rain ─────────────────────────────────────────
+    function spawnAmbient() {
+      const img = document.createElement("img");
+      img.src = "alba2-face.png";
+      img.className = "ambient";
+      img.style.left = Math.random() * 100 + "vw";
+      const duration = 6 + Math.random() * 5;
+      img.style.animationDuration = duration + "s";
+      const size = 50 + Math.random() * 60;
+      img.style.width = size + "px";
+      document.body.appendChild(img);
+      setTimeout(() => img.remove(), duration * 1000);
+    }
+    setInterval(spawnAmbient, 900);
+
+    // ─── confetti burst ─────────────────────────────────────────────────────
+    const CONFETTI_EMOJI = ["🎉", "😂", "💀", "🗣️", "🔥"];
+
+    function spawnConfetti(anchor, count = 8) {
+      const rect = anchor.getBoundingClientRect();
+      for (let i = 0; i < count; i++) {
+        const span = document.createElement("span");
+        span.className = "confetti";
+        span.textContent = CONFETTI_EMOJI[Math.floor(Math.random() * CONFETTI_EMOJI.length)];
+        span.style.left = (rect.left + Math.random() * rect.width) + "px";
+        span.style.top = rect.top + "px";
+        document.body.appendChild(span);
+        span.addEventListener("animationend", () => span.remove());
+      }
+    }
+
+    // ─── Alba image explosion ───────────────────────────────────────────────
+    function explodeAlba() {
+      const center = document.createElement("img");
+      center.src = "alba.png";
+      center.className = "explosion-center";
+      document.body.appendChild(center);
+      center.addEventListener("animationend", () => center.remove());
+
+      const shardCount = 10;
+      for (let i = 0; i < shardCount; i++) {
+        const shard = document.createElement("img");
+        shard.src = "alba.png";
+        shard.className = "explosion-shard";
+        const angle = (Math.PI * 2 * i) / shardCount + Math.random() * 0.4;
+        const distance = 180 + Math.random() * 220;
+        shard.style.setProperty("--tx", Math.cos(angle) * distance + "px");
+        shard.style.setProperty("--ty", Math.sin(angle) * distance + "px");
+        shard.style.setProperty("--rot", (Math.random() * 720 - 360) + "deg");
+        document.body.appendChild(shard);
+        shard.addEventListener("animationend", () => shard.remove());
+      }
+    }
+
+    // ─── rank system ────────────────────────────────────────────────────────
+    const RANKS = [
+      [0,  "Rookie Basically-Hearer"],
+      [5,  "Certified Basically Victim"],
+      [15, "Basically Survivor"],
+      [30, "Basically Menace Witness"],
+      [50, "BASICALLY LEGEND"],
+      [100, "ASCENDED — BASICALLY GOD"]
+    ];
+
+    function rankFor(n) {
+      let label = RANKS[0][1];
+      for (const [threshold, name] of RANKS) {
+        if (n >= threshold) label = name;
+      }
+      return label;
+    }
+
+    // ─── caption roulette ───────────────────────────────────────────────────
+    const CAPTIONS = [
+      "scientists are concerned",
+      "new personal record, unfortunately",
+      "Alba has been served",
+      "this is fine. everything is fine.",
+      "the basically-ometer is overheating",
+      "somewhere, a thesaurus is crying",
+      "Alba, please. PLEASE.",
+      "logged for posterity",
+      "the count grows. so does the pain",
+      "basically certified",
+    ];
+
+    function randomCaption() {
+      document.getElementById("caption").textContent =
+        CAPTIONS[Math.floor(Math.random() * CAPTIONS.length)];
+    }
+
+    // ─── milestone celebration ──────────────────────────────────────────────
+    let lastMilestoneShown = 0;
+
+    function celebrateMilestone(n) {
+      const banner = document.getElementById("milestoneBanner");
+      banner.textContent = `${n}×  BASICALLY  OVERLOAD`;
+      banner.classList.remove("show");
+      void banner.offsetWidth; // restart animation
+      banner.classList.add("show");
+
+      const flash = document.getElementById("flash");
+      flash.classList.remove("go");
+      void flash.offsetWidth;
+      flash.classList.add("go");
+
+      spawnConfetti(document.getElementById("btn"), 28);
+      milestoneSound();
+      document.body.classList.add("shake");
+      setTimeout(() => document.body.classList.remove("shake"), 350);
+    }
+
+    // ─── real-time listener ─────────────────────────────────────────────────
     onSnapshot(ref, (snap) => {
       const data = snap.data();
       const n = data ? data.count : 0;
       document.getElementById("count").textContent = n.toLocaleString();
-      document.getElementById("status").textContent = "Live ✓";
-      document.getElementById("status").className = "status ok";
+      document.getElementById("rank").textContent = rankFor(n);
+      document.getElementById("status").textContent = "";
       document.getElementById("btn").disabled = false;
+      document.title = n > 0 ? `(${n}) Basically Counter 😭` : "Basically Counter";
+
+      if (n > 0 && n % 10 === 0 && n !== lastMilestoneShown) {
+        lastMilestoneShown = n;
+        celebrateMilestone(n);
+      }
     }, (err) => {
       console.error(err);
       document.getElementById("status").textContent = "Connection error — check Firebase config";
@@ -256,13 +586,17 @@
           tx.set(ref, { count: prev + 1 });
         });
 
-        session++;
-        document.getElementById("session").textContent = session;
-
-        // bump animation
         const el = document.getElementById("count");
         el.classList.add("bump");
         setTimeout(() => el.classList.remove("bump"), 120);
+
+        document.body.classList.add("shake");
+        setTimeout(() => document.body.classList.remove("shake"), 350);
+
+        spawnConfetti(btn);
+        explodeAlba();
+        popSound();
+        randomCaption();
       } catch (e) {
         console.error(e);
         document.getElementById("status").textContent = "Failed to save — try again";
