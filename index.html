@@ -193,7 +193,7 @@
 </head>
 <body>
   <div class="container">
-    <p class="meme-top">every time <span>[coworker name]</span> says…</p>
+    <p class="meme-top">every time <span>Alba</span> says…</p>
 
     <div class="card">
       <p class="word-label">the word</p>
@@ -216,16 +216,14 @@
     import { getFirestore, doc, onSnapshot, runTransaction }
       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // ─── REPLACE THIS with your Firebase project config ───────────────────────
     const firebaseConfig = {
-      apiKey:            "REPLACE_ME",
-      authDomain:        "REPLACE_ME.firebaseapp.com",
-      projectId:         "REPLACE_ME",
-      storageBucket:     "REPLACE_ME.appspot.com",
-      messagingSenderId: "REPLACE_ME",
-      appId:             "REPLACE_ME"
+      apiKey:            "AIzaSyBdMQUUc6Js0Y1pY_I8XjsuHViTpMto6Es",
+      authDomain:        "counters-a3fec.firebaseapp.com",
+      projectId:         "counters-a3fec",
+      storageBucket:     "counters-a3fec.firebasestorage.app",
+      messagingSenderId: "798547330061",
+      appId:             "1:798547330061:web:aed630bddccc9fe7360144"
     };
-    // ──────────────────────────────────────────────────────────────────────────
 
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
