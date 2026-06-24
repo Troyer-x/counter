@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basically Counter</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --card: #1a1a1a;
+      --accent: #ff4757;
+      --accent2: #ffa502;
+      --text: #f1f2f6;
+      --sub: #747d8c;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+
+    /* animated bg dots */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, #ffffff08 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .meme-top {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(1.4rem, 5vw, 2rem);
+      text-transform: uppercase;
+      color: var(--text);
+      text-shadow: 3px 3px 0 #000;
+      text-align: center;
+      letter-spacing: 1px;
+      line-height: 1.2;
+    }
+
+    .meme-top span {
+      color: var(--accent2);
+    }
+
+    .card {
+      background: var(--card);
+      border: 2px solid #2f2f2f;
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: 0 0 40px #ff47570a;
+    }
+
+    .word-label {
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--sub);
+    }
+
+    .word {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(3rem, 15vw, 5.5rem);
+      color: var(--accent);
+      text-transform: uppercase;
+      text-shadow: 4px 4px 0 #7f0000;
+      line-height: 1;
+      animation: pulse-word 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-word {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .count-label {
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--sub);
+    }
+
+    .count {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(5rem, 25vw, 9rem);
+      line-height: 1;
+      background: linear-gradient(135deg, #f1f2f6, #ffa502);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: transform 0.1s ease;
+    }
+
+    .count.bump {
+      transform: scale(1.15);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1.1rem 1rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Anton', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      box-shadow: 0 4px 0 #7f0000;
+      position: relative;
+      top: 0;
+    }
+
+    .btn:hover { background: #ff6b81; }
+
+    .btn:active {
+      top: 4px;
+      box-shadow: none;
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      font-size: 0.8rem;
+      color: var(--sub);
+      min-height: 1.2em;
+      text-align: center;
+    }
+
+    .status.error { color: var(--accent); }
+    .status.ok { color: #2ed573; }
+
+    .meme-bottom {
+      font-size: 0.9rem;
+      color: var(--sub);
+      text-align: center;
+      font-style: italic;
+    }
+
+    .session-badge {
+      font-size: 0.75rem;
+      background: #ffffff0d;
+      border: 1px solid #2f2f2f;
+      border-radius: 999px;
+      padding: 0.3rem 0.9rem;
+      color: var(--sub);
+    }
+
+    .session-badge b { color: var(--accent2); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p class="meme-top">every time <span>[coworker name]</span> says…</p>
+
+    <div class="card">
+      <p class="word-label">the word</p>
+      <div class="word">Basically</div>
+      <div class="divider"></div>
+      <p class="count-label">times said</p>
+      <div class="count" id="count">—</div>
+      <button class="btn" id="btn" onclick="increment()">+ He said it again</button>
+      <p class="status" id="status">Connecting…</p>
+    </div>
+
+    <p class="meme-badge session-badge">session taps: <b id="session">0</b></p>
+
+    <p class="meme-bottom">"basically, it's like… basically…"</p>
+  </div>
+
+  <!-- Firebase v9 (modular, CDN) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, runTransaction }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // ─── REPLACE THIS with your Firebase project config ───────────────────────
+    const firebaseConfig = {
+      apiKey:            "REPLACE_ME",
+      authDomain:        "REPLACE_ME.firebaseapp.com",
+      projectId:         "REPLACE_ME",
+      storageBucket:     "REPLACE_ME.appspot.com",
+      messagingSenderId: "REPLACE_ME",
+      appId:             "REPLACE_ME"
+    };
+    // ──────────────────────────────────────────────────────────────────────────
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    const ref = doc(db, "counters", "basically");
+
+    let session = 0;
+
+    // real-time listener
+    onSnapshot(ref, (snap) => {
+      const data = snap.data();
+      const n = data ? data.count : 0;
+      document.getElementById("count").textContent = n.toLocaleString();
+      document.getElementById("status").textContent = "Live ✓";
+      document.getElementById("status").className = "status ok";
+      document.getElementById("btn").disabled = false;
+    }, (err) => {
+      console.error(err);
+      document.getElementById("status").textContent = "Connection error — check Firebase config";
+      document.getElementById("status").className = "status error";
+    });
+
+    window.increment = async function () {
+      const btn = document.getElementById("btn");
+      btn.disabled = true;
+
+      try {
+        await runTransaction(db, async (tx) => {
+          const snap = await tx.get(ref);
+          const prev = snap.exists() ? snap.data().count : 0;
+          tx.set(ref, { count: prev + 1 });
+        });
+
+        session++;
+        document.getElementById("session").textContent = session;
+
+        // bump animation
+        const el = document.getElementById("count");
+        el.classList.add("bump");
+        setTimeout(() => el.classList.remove("bump"), 120);
+      } catch (e) {
+        console.error(e);
+        document.getElementById("status").textContent = "Failed to save — try again";
+        document.getElementById("status").className = "status error";
+      } finally {
+        btn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>
